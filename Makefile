@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PYTHON := /opt/homebrew/bin/python3 # TODO: add your python path
+PYTHON := /home/diego/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python3.11 # TODO: add your python path
 VENV_DIR := .venv
 ACTIVATE_VENV := source $(VENV_DIR)/bin/activate
 

@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 class DataLoader:
     def __init__(self, filepath="data/Tweets.csv"):
         self.filepath = filepath
-        self.load_data()
+        self.data = self.load_data()
         self.vectorizer = None
         self.encoder = None
 
@@ -18,14 +18,18 @@ class DataLoader:
     @staticmethod
     def remove_characters(text: str) -> str:
         """Remove non-letters from a given string"""
-        remove_chars = string.punctuation
+        remove_chars = string.punctuation + string.digits + string.whitespace
         translator = str.maketrans('', '', remove_chars)
         return text.translate(translator)
 
     def clean_text(self, text: str) -> str:
         """Keep only retain words in a given string"""
+        text = str(text) if text is not None else ""
+        
+        url_pattern = r'https?://\S+|www\.\S+'
+        text = re.sub(url_pattern, '', text)    
         text = self.remove_characters(text)
-        return text.strip()
+        return text
 
     def vectorize_text(self, tweets: list[str]):
         self.vectorizer = TfidfVectorizer(max_features=2500, min_df=1, max_df=0.8)
