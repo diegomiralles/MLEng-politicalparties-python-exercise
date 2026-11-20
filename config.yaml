@@ -1,0 +1,16 @@
+# Paths
+input_data_path: "data/Tweets.csv"
+output_model_path: "artifacts/models/xgboost.ubj"
+
+# Text Loader Configuration
+text_loader:
+  filepath: input_data_path
+  vectorizer:
+    max_features: 2500
+    min_df: 1
+    max_df: 0.8
+  
+Training Configuration:
+  test_size: 0.2
+  random_state: 42
+  
