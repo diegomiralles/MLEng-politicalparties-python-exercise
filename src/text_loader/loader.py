@@ -1,22 +1,34 @@
+from enum import Enum
+
 import pandas as pd
 import string
 import re
+from pydantic import EncoderProtocol
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 import yaml
 
-from typing import Optional
+from text_loader.interface import DataReaderProtocol, VectorizerProtocol
+
+class VariableType(Enum):
+    TWEET = "Tweet"
+    PARTY = "Party"
 
 class DataLoader:
     def __init__(self, 
-                 filepath:str="data/Tweets.csv",
-                 vectorizer: Optional[TfidfVectorizer] = None,
-                 encoder: Optional[LabelEncoder] = None):
+                 filepath:str,
+                 reader: DataReaderProtocol,
+                 vectorizer: VectorizerProtocol,
+                 encoder: EncoderProtocol):
 
         self.filepath = filepath
-        self.data = self.load_data()
+        self.reader = reader
         self.vectorizer = vectorizer
         self.encoder = encoder
+
+    def __post_init__(self):
+        self.data = self.reader.load_data()
+
     @classmethod
     def from_config(cls, config_path: str):
 
@@ -57,11 +69,27 @@ class DataLoader:
     def label_encoder(self, parties: pd.Series):
         return self.encoder.fit_transform(parties)
 
-    def preprocess_tweets(self):
-        self.data.Tweet = self.data.Tweet.apply(self.clean_text) # type: ignore
+    def preprocess_tweets(self,clean_text:bool=False):
+        if clean_text:
+            self.data.Tweet = self.data.Tweet.apply(self.clean_text) # type: ignore
         return self.vectorize_text(self.data.Tweet.values) # type: ignore
 
-    def preprocess_parties(self):
-        self.data.Party = self.data.Party.apply(self.clean_text) # type: ignore
+    def preprocess_parties(self,clean_text:bool=False):
+        if clean_text:
+            self.data.Party = self.data.Party.apply(self.clean_text) # type: ignore
         return self.label_encoder(self.data.Party.values) # type: ignore
 
+    def preprocess_data(
+              self,
+              clean_text: bool = False,
+              variable_type: VariableType = VariableType.TWEET
+              ):
+        
+        match variable_type:
+            case VariableType.TWEET:
+                return self.preprocess_tweets(clean_text)
+            case VariableType.PARTY:
+                return self.preprocess_parties(clean_text)
+            case _:
+                raise ValueError(f"Invalid variable_type: {variable_type}")
+        

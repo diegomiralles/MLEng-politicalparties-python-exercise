@@ -1,0 +1,20 @@
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+
+# Environments
+.env
+.venv
+
+#IDE
+
+.vscode/
+
+# Artifacts dir
+artifacts/
